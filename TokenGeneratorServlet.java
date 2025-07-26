@@ -10,78 +10,60 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-
 @WebServlet("/generateToken")
 public class TokenGeneratorServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
-	private static final long serialVersionUID = 1L;
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Get patient and doctor IDs from the form
+        int patientId = Integer.parseInt(req.getParameter("patient_id"));
+        int doctorId = Integer.parseInt(req.getParameter("doctor_id"));
 
-		String name = req.getParameter("name");
-		String mobno = req.getParameter("mobno");
-		long phone = Long.parseLong(mobno);
-		String serviceType = req.getParameter("service");
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        int newTokenNo = 1;
 
-		Connection c = null;
-		PreparedStatement UserPstmt = null;
-		PreparedStatement TokenPstmt = null;
-		ResultSet rs = null;
-		ResultSet tokenRs = null;
+        try {
+            conn = DB_connection.getConnection();
 
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
+            // Get last token number for the doctor today
+            String query = "SELECT MAX(token_no) AS last_token FROM tokens WHERE doctor_id = ? AND DATE(time_generated) = CURDATE()";
+            pstmt = conn.prepareStatement(query);
+            pstmt.setInt(1, doctorId);
+            rs = pstmt.executeQuery();
 
-			c = DriverManager.getConnection("jdbc:mysql://localhost:3306/queue_db", "root", "adeshpol141546");
+            if (rs.next()) {
+                int lastToken = rs.getInt("last_token");
+                newTokenNo = lastToken + 1;
+            }
 
-			// Insert into users
-			String UserSqlQuery = "INSERT INTO users (name, phone) VALUES (?, ?)";
-			UserPstmt = c.prepareStatement(UserSqlQuery, Statement.RETURN_GENERATED_KEYS);
-			UserPstmt.setString(1, name);
-			UserPstmt.setLong(2, phone);
-			UserPstmt.executeUpdate();
+            // Insert new token into DB
+            String insertQuery = "INSERT INTO tokens (patient_id, doctor_id, token_no) VALUES (?, ?, ?)";
+            pstmt = conn.prepareStatement(insertQuery);
+            pstmt.setInt(1, patientId);
+            pstmt.setInt(2, doctorId);
+            pstmt.setInt(3, newTokenNo);
+            pstmt.executeUpdate();
 
-			rs = UserPstmt.getGeneratedKeys();
-			int userId = 0;
-			if (rs.next()) {
-				userId = rs.getInt(1);
-			}
+            // Send response
+            resp.setContentType("text/html");
+            PrintWriter out = resp.getWriter();
+            out.println("<h2>Token Generated Successfully!</h2>");
+            out.println("<p>Your Token Number: <strong>" + newTokenNo + "</strong></p>");
+            out.println("<a href='index.jsp'>Back to Home</a>");
 
-			// Insert into tokens
-			String TokenSqlQuery = "INSERT INTO tokens (user_id, service_type, status) VALUES (?, ?, ?)";
-			TokenPstmt = c.prepareStatement(TokenSqlQuery, Statement.RETURN_GENERATED_KEYS);
-			TokenPstmt.setInt(1, userId);
-			TokenPstmt.setString(2, serviceType);
-			TokenPstmt.setString(3, "WAITING");
-			TokenPstmt.executeUpdate();
-
-			tokenRs = TokenPstmt.getGeneratedKeys();
-			int tokenId = 0;
-			if (tokenRs.next()) {
-				tokenId = tokenRs.getInt(1);
-			}
-
-			// Response
-			resp.setContentType("text/html");
-			PrintWriter out = resp.getWriter();
-			out.println("<h2>Your Token Number is: " + tokenId + "</h2>");
-			out.println("<p>Please wait. You'll be called shortly.</p>");
-			out.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			resp.getWriter().println("Error Generating Token: " + e.getMessage());
-		} finally {
-			try {
-				if (rs != null) rs.close();
-				if (tokenRs != null) tokenRs.close();
-				if (UserPstmt != null) UserPstmt.close();
-				if (TokenPstmt != null) TokenPstmt.close();
-				if (c != null) c.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}
-		}
-	}
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Token generation failed.");
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {}
+            try { if (pstmt != null) pstmt.close(); } catch (Exception e) {}
+            try { if (conn != null) conn.close(); } catch (Exception e) {}
+        }
+    }
 }
+
