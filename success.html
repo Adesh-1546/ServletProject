@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Success</title>
+  <style>
+    body {
+      background: #e0f7fa;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .card h2 {
+      color: #00796b;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: #444;
+      font-size: 18px;
+    }
+
+    .card button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #00796b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .card button:hover {
+      background: #004d40;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>✅ Data Inserted Successfully!</h2>
+    <p>Your information has been stored in the database.</p>
+    <button onclick="window.location.href='home.html'">Go to Home</button>
+  </div>
+</body>
+</html>

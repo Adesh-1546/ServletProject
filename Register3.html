@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!---Coding By CodingLab | www.codinglabweb.com--->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <!--<title>Registration Form in HTML CSS</title>-->
+    <!---Custom CSS File--->
+    <link rel="stylesheet" href="Register.css" />
+  </head>
+  <body>
+    <section class="container">
+      <header>Account Details</header>
+      <form action="#" class="form" method="post">
+        <div class="input-box">
+          <label>Card last 4 digit</label>
+          <input type="text" placeholder="Enter XXXX XXXX ____ " required />
+        </div>
+          <div class="input-box">
+            <label>Initial deposit</label>
+            <input type="number" placeholder="Ammount in Rupees" required />
+          </div>
+
+          
+          
+        <div class="gender-box">
+          <h3>Services Required</h3>
+          <div class="gender-option">
+            <div class="gender">
+              <input type="radio" id="check-male" name="saving" checked />
+              <label for="check-male">ATM card</label>
+            </div>
+            <div class="gender">
+              <input type="radio" id="check-female" name="business" />
+              <label for="check-female">Internet Banking</label>
+            </div>
+            <div class="gender">
+              <input type="radio" id="check-other" name="fddeposit" />
+              <label for="check-other">Email alert</label>
+            </div>
+            <div class="gender">
+              <input type="radio" id="check-other" name="fddeposit" />
+              <label for="check-other">Cheque Book</label>
+            </div>
+          </div>
+        </div>
+        <div class="input-box">
+          <label>Account Type</label>
+          <div class="select-box">
+              <select>
+                <option hidden>Type</option>
+                <option>Saving</option>
+                <option>Business</option>
+                <option>Fixed Deposit</option>
+              </select>
+            </div>
+        </div>
+        
+        <div class="input-box address">
+          <label>Password</label>
+          <input type="text" placeholder="Enter Strong Password" required />
+          
+        </div>
+        <button>Submit</button>
+      </form>
+    </section>
+  </body>
+</html>
